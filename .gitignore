@@ -1,0 +1,55 @@
+# Python / FastAPI
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.env.*
+.venv/
+venv/
+pip-log.txt
+coverage.*
+*.sqlite3
+*.log
+
+# Database & Alembic
+*.db
+*.sqlite
+alembic.ini
+migrations/versions/*.pyc
+migrations/__pycache__/
+
+# Media Files
+uploads/
+media/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.wav
+*.mp3
+*.webp
+*.pdf
+
+# OS / IDE junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Docker / Deployment
+*.pid
+docker-compose.override.yml
