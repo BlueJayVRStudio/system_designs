@@ -1,9 +1,12 @@
 from fastapi import FastAPI, HTTPException, Depends, Form
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import Dict
 
 from fastapi import APIRouter, HTTPException
 from tinydb import TinyDB, Query
+
+from fastapi.templating import Jinja2Templates
 
 from starlette.requests import Request
 
@@ -13,13 +16,15 @@ import os
 
 from datetime import datetime
 
+templates = Jinja2Templates(directory="./users")
+
 import bcrypt
 def hash_password(plain: str | None) -> str | None:
     return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8") if plain else None
 
 router = APIRouter()
 
-@router.get("/users/{user_id}")
+@router.get("/users/search/{user_id}")
 def get_user(user_id: str, request: Request):
     # print(request.session["user"]) # it works
     db = Session()
@@ -31,7 +36,11 @@ def get_user(user_id: str, request: Request):
     finally:
         db.close()
 
-@router.post("/users")
+@router.get("/users/create", response_class=HTMLResponse)
+def show_create_user_form(request: Request):
+    return templates.TemplateResponse("create_form.html", {"request": request})
+
+@router.post("/users/create")
 def create_user(
     user_id: str = Form(...),
     name: str = Form(...),
