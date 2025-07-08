@@ -1,0 +1,101 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb:/data/db
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: myapp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # MinIO console
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+
+volumes:
+  mongodb:
+    external: true
+  pgdata:
+  minio-data:
+  
+# version: "3.8"
+
+# services:
+#   mongo1:
+#     image: mongo:6
+#     container_name: mongo1
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - monogodb_backUP_1:/data/db
+#     restart: unless-stopped
+
+#   mongo2:
+#     image: mongo:6
+#     container_name: mongo2
+#     ports:
+#       - "27018:27017"
+#     volumes:
+#       - mongodb_backUP:/data/db
+#     restart: unless-stopped
+
+# volumes:
+#   monogodb_backUP_1:
+#     external: true
+#   mongodb_backUP:
+#     external: true
+
+  # mongo1:
+  #   image: mongo:6
+  #   container_name: mongo1
+  #   ports:
+  #     - 27017:27017
+  #   command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+  #   # networks:
+  #   #   - mongo-cluster
+
+  # mongo2:
+  #   image: mongo:6
+  #   container_name: mongo2
+  #   ports:
+  #     - 27018:27017
+  #   command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+  #   # networks:
+  #   #   - mongo-cluster
+
+#   mongo3:
+#     image: mongo:6
+#     container_name: mongo3
+#     ports:
+#       - 27019:27017
+#     command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+#     # networks:
+#     #   - mongo-cluster
+
+# # networks:
+# #   mongo-cluster:

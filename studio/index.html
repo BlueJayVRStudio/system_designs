@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Media Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+
+    .player-container {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    video, audio {
+      width: 100%;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    h2 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="player-container">
+    <h2>Simple Video Player</h2>
+    <video controls>
+      <source src="{{ video_url }}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <h2>Simple Audio Player</h2>
+    <audio controls>
+      <source src="{{ video_url }}" type="audio/mp3">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+</body>
+</html>
