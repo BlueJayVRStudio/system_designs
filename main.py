@@ -12,7 +12,7 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY")
 
 # Mount router with NO prefix
 app.include_router(video.router, prefix="/studio")
-app.include_router(users.router, prefix="/studio")
+app.include_router(users.router, prefix="/login")
 
 @app.get('/')
 def main_home(request: Request):

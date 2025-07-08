@@ -1,13 +1,20 @@
-import asyncio
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse, StreamingResponse
-from pydantic import BaseModel
-from typing import List, Optional
 import os
 import uuid
 import re
-from starlette.requests import Request
 import time
+
+import asyncio
+
+from models import auth_models
+from database import Session, s3_client
+
+from pydantic import BaseModel
+from typing import List, Optional
+
+from starlette.requests import Request
+
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi.responses import FileResponse, StreamingResponse
 
 from fastapi import APIRouter, HTTPException
 from tinydb import TinyDB, Query
@@ -15,17 +22,7 @@ from tinydb import TinyDB, Query
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
 
-import boto3
-
 templates = Jinja2Templates(directory="./studio/")
-
-s3_client = boto3.client(
-    's3',
-    aws_access_key_id=os.getenv("MINIO_ACCESS_KEY"),
-    aws_secret_access_key=os.getenv("MINIO_SECRET_KEY"),
-    endpoint_url='http://192.168.50.249:9000',
-    config=boto3.session.Config(signature_version='s3v4')
-)
 
 router = APIRouter()
 db = TinyDB("users.json")
