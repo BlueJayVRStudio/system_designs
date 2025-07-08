@@ -13,6 +13,7 @@ from fastapi import APIRouter, HTTPException
 from tinydb import TinyDB, Query
 
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
 
 import boto3
 
@@ -80,6 +81,9 @@ async def blocking_route_1():
 
 @router.get("/home")
 def main(request: Request):
+    if "user" not in request.session:
+        return JSONResponse(status_code=403, content={"error": "Access denied"})
+
     url = s3_client.generate_presigned_url(
         ClientMethod='get_object',
         Params={
