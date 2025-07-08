@@ -31,10 +31,12 @@ router = APIRouter()
 def show_login_form(request: Request):
     error = request.query_params.get("error")
     logout = request.query_params.get("logout")
+    session_invalid = request.query_params.get("session_invalid")
     return templates.TemplateResponse("login_form.html", {
         "request": request,
         "error": error,
-        "logout": logout
+        "logout": logout,
+        "session_invalid": session_invalid
     })
 
 @router.post("/")
@@ -57,7 +59,7 @@ def login(
 
 @router.post("/logout")
 def logout(request: Request):
-    request.session.clear()
+    request.session.pop("user_id")
     return RedirectResponse(url="/login?logout=1", status_code=HTTP_303_SEE_OTHER)
 
 @router.get("/users/search/{user_id}")

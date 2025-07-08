@@ -9,10 +9,13 @@
     {% if error %}
         <p style="color: red;">Invalid credentials. Please try again.</p>
     {% endif %}
+    {% if session_invalid %}
+        <p style="color: red;">Session Invalid. Please login again.</p>
+    {% endif %}
     {% if logout %}
         <p style="color: rgb(11, 127, 32);">Logout Successful.</p>
     {% endif %}
-
+    
     <form action="/login" method="post">
         <label>User ID:</label><br>
         <input type="user_id" name="user_id" required><br><br>

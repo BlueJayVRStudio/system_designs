@@ -14,7 +14,7 @@ from typing import List, Optional
 from starlette.requests import Request
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 
 from fastapi import APIRouter, HTTPException
 from tinydb import TinyDB, Query
@@ -78,8 +78,8 @@ async def blocking_route_1():
 
 @router.get("/home")
 def main(request: Request):
-    if "user" not in request.session:
-        return JSONResponse(status_code=403, content={"error": "Access denied"})
+    if "user_id" not in request.session:
+        return RedirectResponse(url="/login?session_invalid=1", status_code=302)
 
     url = s3_client.generate_presigned_url(
         ClientMethod='get_object',
