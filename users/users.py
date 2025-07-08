@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, Form
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 from typing import Dict
 
@@ -9,6 +9,7 @@ from tinydb import TinyDB, Query
 from fastapi.templating import Jinja2Templates
 
 from starlette.requests import Request
+from starlette.status import HTTP_303_SEE_OTHER
 
 from models.auth_models import User
 from database import Session
@@ -21,8 +22,43 @@ templates = Jinja2Templates(directory="./users")
 import bcrypt
 def hash_password(plain: str | None) -> str | None:
     return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8") if plain else None
+def verify_password(to_check, in_store):
+    return bcrypt.checkpw(to_check.encode(), in_store.encode())
 
 router = APIRouter()
+
+@router.get("/")
+def show_login_form(request: Request):
+    error = request.query_params.get("error")
+    logout = request.query_params.get("logout")
+    return templates.TemplateResponse("login_form.html", {
+        "request": request,
+        "error": error,
+        "logout": logout
+    })
+
+@router.post("/")
+def login(
+    request: Request,
+    user_id: str = Form(...),
+    password: str = Form(None),
+):
+    db = Session()
+    try:
+        user = db.query(User).filter(User.user_id == user_id).first()
+        if not user or not verify_password(password, user.password):
+            # Redirect with an error query param
+            return RedirectResponse(url="/login?error=1", status_code=HTTP_303_SEE_OTHER)
+
+        request.session["user_id"] = user.user_id
+        return RedirectResponse(url="/", status_code=HTTP_303_SEE_OTHER)
+    finally:
+        db.close()
+
+@router.post("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/login?logout=1", status_code=HTTP_303_SEE_OTHER)
 
 @router.get("/users/search/{user_id}")
 def get_user(user_id: str, request: Request):
