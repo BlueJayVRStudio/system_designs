@@ -20,6 +20,6 @@ def main_home(request: Request):
         return request.session["user"]["name"]
     return "not logged in brother"
 
-@app.get('/login/{name}')
+@app.get('/set_name/{name}')
 def main_home(request: Request, name):
     request.session["user"] = {"name": name}

@@ -1,25 +1,27 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Form
 from pydantic import BaseModel
 from typing import Dict
 
 from fastapi import APIRouter, HTTPException
 from tinydb import TinyDB, Query
 
+from starlette.requests import Request
+
 from models.auth_models import User
 from database import Session
 import os
 
+from datetime import datetime
+
+import bcrypt
+def hash_password(plain: str | None) -> str | None:
+    return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8") if plain else None
+
 router = APIRouter()
 
-# @router.get("/users/{user_id}")
-# def get_user(user_id: str, db: Session = Depends(get_db)):
-#     user = db.query(User).filter(User.user_id == user_id).first()
-#     if not user:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     return user
-
 @router.get("/users/{user_id}")
-def get_user(user_id: str):
+def get_user(user_id: str, request: Request):
+    # print(request.session["user"]) # it works
     db = Session()
     try:
         user = db.query(User).filter(User.user_id == user_id).first()
@@ -29,12 +31,40 @@ def get_user(user_id: str):
     finally:
         db.close()
 
-# @router.post("/users")
-# def create_user(user: User):
-#     if db.search(UserQuery.id == user.id):
-#         raise HTTPException(status_code=400, detail="User already exists")
-#     db.insert(user.dict())
-#     return {"msg": "User created"}
+@router.post("/users")
+def create_user(
+    user_id: str = Form(...),
+    name: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(None),
+):
+    db = Session()
+    try:
+        if db.query(User).filter(User.user_id == user_id).first():
+            raise HTTPException(status_code=400, detail="User ID already exists")
+
+        if db.query(User).filter(User.email == email).first():
+            raise HTTPException(status_code=400, detail="Email already exists")
+
+        hashed_password = hash_password(password)
+
+        new_user = User(
+            user_id=user_id,
+            name=name,
+            email=email,
+            password=hashed_password,
+            created_at=datetime.utcnow(),
+            email_verified=False,
+            version=1,
+        )
+
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        return {"msg": "User created", "user_id": new_user.user_id}
+    finally:
+        db.close()
 
 # @router.put("/users/{user_id}")
 # def update_user(user_id: str, updated: User):
